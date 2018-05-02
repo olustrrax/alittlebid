@@ -29,7 +29,7 @@
             signIn(){
                 firebase.auth().signInWithEmailAndPassword(this.formData.email,this.formData.password)
                     .then(user =>{
-                        this.$router.replace('/main')
+                        this.$router.replace('/product')
                     })
                     .catch(e=>{
                         alert(e.message)
