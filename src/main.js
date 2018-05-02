@@ -16,8 +16,11 @@ var config = {
   storageBucket: "egco427-project.appspot.com",
   messagingSenderId: "281207958459"
 };
+
+
 firebase.initializeApp(config);
 window.firebase = firebase;
+
 
 /* eslint-disable no-new */
 new Vue({
