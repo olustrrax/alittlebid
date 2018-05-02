@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Main from '@/components/Main'
 import SignIn from '@/components/SignIn'
 import Register from '@/components/Register'
-
+import Product from '@/components/Product'
 Vue.use(Router)
 
 let router = new Router({
@@ -20,6 +20,11 @@ let router = new Router({
       path:'/register',
       name:'register',
       component:Register
+    },
+    {
+      path:'/product',
+      name:'product',
+      component:Product
     },
     {
       path:'*',
