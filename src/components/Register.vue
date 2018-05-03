@@ -38,40 +38,29 @@
                 <div class="inline fields">
                     <div class="field">
                         <select>
-                            <!-- <option value="">เพศ</option> -->
                             <option value="1">ชาย</option>
                             <option value="0">หญิง</option>
                             <option value="0">อื่นๆ</option>
                         </select>
-                        <!-- <div class="ui radio checkbox">
-                            <input name="gender" tabindex="0" value="M"  type="radio">
-                            <label>ชาย</label>
-                        </div> -->
+                        
                     </div>
-                    <!-- <div class="field">
-                    <div class="ui radio checkbox">
-                        <input name="gender" tabindex="0" value="F" type="radio">
-                        <label>หญิง</label>
-                    </div>
-                    </div>
-                    <div class="field">
-                    <div class="ui radio checkbox">
-                        <input name="gender" tabindex="0" value="O" type="radio">
-                        <label>อื่นๆ</label>
-                    </div>
-                    </div> -->
-                   
                 </div>
 
                 <div class="field">
                     <div class="ui teal horizontal label">ที่อยู่ปัจจุบัน</div>
                     <textarea rows="2" placeholder="11/11 หมู่บ้าน รักดี ต.บางบัวทอง อ.บางบัวทอง จ.นนทบุรี 11110"></textarea>
                 </div>
-                <div class="six wide field">
-                    <input placeholder="เบอร์โทรศัพท์" type="text">
+                <div class="ten wide field">
+                    <div class="ui teal horizontal label">อีเมล</div>
+                   <input type="email" v-model="formData.email" class="form-control" placeholder="email">
+                </div>
+                <div class="ten wide field">
+                    <div class="ui teal horizontal label">รหัสผ่าน</div>
+                   <input type="password" v-model="formData.password" class="form-control" placeholder="password">
+            
                 </div>
                 <br><br><br>
-                <div class="ui submit button" @click="regis">สมัคร</div>
+                <div class="ui submit button" @click="signUp">สมัคร</div>
             </div>
         </div>
         
@@ -85,9 +74,24 @@
 <script>
 export default {
   name: "register",
+  data(){
+      return{
+          formData:{
+              email: '',
+              password: '',
+          }
+      }
+  },
   methods:{
-      regis(){
-          
+      signUp(){
+          var thisfunc = this
+        firebase.auth().createUserWithEmailAndPassword(this.formData.email,this.formData.password)
+            .then( user=> {
+                thisfunc.$router.replace('/main')
+            })
+            .catch( e =>{
+                alert(e.message)
+            })
       }
   }
 }
