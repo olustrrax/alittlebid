@@ -1,39 +1,83 @@
 <template>
-  <div class="register">
-      <div class="container">
-        <div class="ui raised padded text container segment">
-            <h2 class="ui orange ribbon label">
+<div class="register">
+<div class="center">
+    <div class="row">
+    <div class="ui raised segment">
+        <div class="ui orange ribbon label">
+            <h2 >
                 ลงทะเบียน
             </h2>
-        <p></p>
-        <p></p>
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-md-offset-3"/>
-        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-md-offset-3">
 
-            <input type="email" v-model="formData.email" class="form-control" placeholder="email">
-            <br>
-            <input type="password" v-model="formData.password" class="form-control" placeholder="password">
-            <br>
-            <input type="password" v-model="formData.confirmPassword" class="form-control" placeholder="password">
-            <br>
-            <input type="text" v-model="formData.firstname" class="form-control" placeholder="firstname">
-            <br>
-            <input type="text" v-model="formData.lastname" class="form-control" placeholder="lastname">
-            <br>
-            <input type="text" v-model="formData.telephone" class="form-control" placeholder="08xxxxxxxx">
-            <br>
-            <input type="text" v-model="formData.account_no" class="form-control" placeholder="12345">
-            <br>
-            <input type="text" v-model="formData.displayname" class="form-control" placeholder="Displayname">
-            <br>
-            <button class="btn btn-success" @click="signUp">SignUp</button>
         </div>
     
-        </div>
-      </div>
-    
+        <br><br><br>
+        <div class="row">
+            <div class="ui small form error">
+                <div class="two fields">
+                    <div class="field">
+                        <div class="ui teal horizontal label">ชื่อจริง</div>
+                        <input type="text" v-model="formData.firstname" placeholder="นาย แดเนียล" type="text">
+                    </div>
+                    <div class="field">
+                        <div class="ui teal horizontal label">นามสกุล</div>
+                        <input type="text" v-model="formData.lastname" placeholder="ศรีจุลโพธิ์" type="text">
+                    </div>
+                </div>
+                <div class="field">
+                  <div class="ui teal horizontal label">รูปประจำตัว</div>
+                  <input type="text" v-model="formData.displayname" class="form-control" placeholder="Displayname">
+                </div>
+                <div class="ui teal horizontal label">บัตรประจำตัวประชาชน</div>
+                <div class="inline fields">
+                <div class="six wide field">
+                    <input placeholder="1111111111" type="text">
+                </div>
+                </div>
+                <div class="ui teal horizontal label">เบอร์โทรศัพท์</div>
+                <div class="inline fields">
+                <div class="six wide field">
+                    <input type="text" v-model="formData.telephone" placeholder="08xxxxxxxx" type="text">
+                </div>
+                </div>
+                <div class="ui teal horizontal label" for="gender">เพศ</div>     
+                <div class="inline fields">
+                    <div class="field">
+                        <select>
+                            <option value="1">ชาย</option>
+                            <option value="0">หญิง</option>
+                            <option value="0">อื่นๆ</option>
+                        </select>
+                        
+                    </div>
+                </div>
 
-  </div>
+                <div class="field">
+                    <div class="ui teal horizontal label">ที่อยู่ปัจจุบัน</div>
+                    <textarea rows="2" v-model="formData.address" placeholder="11/11 หมู่บ้าน รักดี ต.บางบัวทอง อ.บางบัวทอง จ.นนทบุรี 11110"></textarea>
+                </div>
+                <div class="ten wide field">
+                   <div class="ui teal horizontal label">อีเมล</div>
+                   <input type="email" v-model="formData.email" class="form-control" placeholder="email">
+                </div>
+                <div class="ten wide field">
+                   <div class="ui teal horizontal label">รหัสผ่าน</div>
+                   <input type="password"  v-model="formData.password" class="form-control" placeholder="password">
+            
+                </div>
+                <div class="ten wide field">
+                  <div class="ui teal horizontal label">กรอกรหัสผ่านอีกครั้ง</div>
+                  <input type="password" v-model="formData.confirmPassword" class="form-control" placeholder="password">
+                </div>
+                <br><br><br>
+                <div class="ui submit button" @click="signUp">สมัครสมาชิก</div>
+            </div>
+        </div>
+        
+    </div>
+
+    </div>
+</div> 
+</div>
 </template>
 
 <script>
@@ -49,7 +93,9 @@ export default {
               lastname:'',
               telephone:'',
               account_no:'',
-              displayname:''
+              displayname:'',
+              address:''
+              
           },
           message:'',
       }
@@ -135,11 +181,20 @@ export default {
       
   }
 }
+
+// $('.ui.radio.checkbox')
+//   .checkbox();
 </script>
 
+
+</style>
+
 <style>
- /* .container{
-    width: 70%;
-    height: 70%;
- } */
+/* @import url('./jquery.Thailand.js/dist/jquery.Thailand.min.css'); */
+.center {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+    border-color: darkgrey;
+}
 </style>
