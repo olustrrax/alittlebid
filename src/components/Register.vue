@@ -7,6 +7,7 @@
             <h2 >
                 ลงทะเบียน
             </h2>
+
         </div>
     
         <br><br><br>
@@ -15,12 +16,16 @@
                 <div class="two fields">
                     <div class="field">
                         <div class="ui teal horizontal label">ชื่อจริง</div>
-                        <input placeholder="นาย แดเนียล" type="text">
+                        <input type="text" v-model="formData.firstname" placeholder="นาย แดเนียล" type="text">
                     </div>
                     <div class="field">
                         <div class="ui teal horizontal label">นามสกุล</div>
-                        <input placeholder="ศรีจุลโพธิ์" type="text">
+                        <input type="text" v-model="formData.lastname" placeholder="ศรีจุลโพธิ์" type="text">
                     </div>
+                </div>
+                <div class="field">
+                  <div class="ui teal horizontal label">รูปประจำตัว</div>
+                  <input type="text" v-model="formData.displayname" class="form-control" placeholder="Displayname">
                 </div>
                 <div class="ui teal horizontal label">บัตรประจำตัวประชาชน</div>
                 <div class="inline fields">
@@ -31,7 +36,7 @@
                 <div class="ui teal horizontal label">เบอร์โทรศัพท์</div>
                 <div class="inline fields">
                 <div class="six wide field">
-                    <input placeholder="เบอร์โทรศัพท์" type="text">
+                    <input type="text" v-model="formData.telephone" placeholder="08xxxxxxxx" type="text">
                 </div>
                 </div>
                 <div class="ui teal horizontal label" for="gender">เพศ</div>     
@@ -48,19 +53,23 @@
 
                 <div class="field">
                     <div class="ui teal horizontal label">ที่อยู่ปัจจุบัน</div>
-                    <textarea rows="2" placeholder="11/11 หมู่บ้าน รักดี ต.บางบัวทอง อ.บางบัวทอง จ.นนทบุรี 11110"></textarea>
+                    <textarea rows="2" v-model="formData.address" placeholder="11/11 หมู่บ้าน รักดี ต.บางบัวทอง อ.บางบัวทอง จ.นนทบุรี 11110"></textarea>
                 </div>
                 <div class="ten wide field">
-                    <div class="ui teal horizontal label">อีเมล</div>
+                   <div class="ui teal horizontal label">อีเมล</div>
                    <input type="email" v-model="formData.email" class="form-control" placeholder="email">
                 </div>
                 <div class="ten wide field">
-                    <div class="ui teal horizontal label">รหัสผ่าน</div>
-                   <input type="password" v-model="formData.password" class="form-control" placeholder="password">
+                   <div class="ui teal horizontal label">รหัสผ่าน</div>
+                   <input type="password"  v-model="formData.password" class="form-control" placeholder="password">
             
                 </div>
+                <div class="ten wide field">
+                  <div class="ui teal horizontal label">กรอกรหัสผ่านอีกครั้ง</div>
+                  <input type="password" v-model="formData.confirmPassword" class="form-control" placeholder="password">
+                </div>
                 <br><br><br>
-                <div class="ui submit button" @click="signUp">สมัคร</div>
+                <div class="ui submit button" @click="signUp">สมัครสมาชิก</div>
             </div>
         </div>
         
@@ -79,20 +88,97 @@ export default {
           formData:{
               email: '',
               password: '',
-          }
+              confirmPassword:'',
+              firstname:'',
+              lastname:'',
+              telephone:'',
+              account_no:'',
+              displayname:'',
+              address:''
+              
+          },
+          message:'',
       }
+  },
+  created(){
+    if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
+    var email = window.localStorage.getItem('emailForSignIn');
+    if (!email) {
+        this.$router.replace('/signin')
+    }
+    firebase.auth().signInWithEmailLink(email, window.location.href)
+      .then(function(result) {
+        window.localStorage.removeItem('emailForSignIn');
+        var user = firebase.auth().currentUser
+        user.delete()
+              .then( res =>{
+
+              })
+              .catch ( err => {
+                  console.log(err)
+              })
+
+      })
+      .catch(function(error) {
+        console.log('auth with mail linke '+error)
+      });
+    }
+    else{                    
+        this.$router.replace('/signin')
+
+    }
+
   },
   methods:{
       signUp(){
-          var thisfunc = this
-        firebase.auth().createUserWithEmailAndPassword(this.formData.email,this.formData.password)
+        if(this.formData.password.match(this.formData.confirmPassword))
+        {
+            firebase.auth().createUserWithEmailAndPassword(this.formData.email,this.formData.password)
             .then( user=> {
-                thisfunc.$router.replace('/main')
+                this.addUser(user.uid)
             })
             .catch( e =>{
+                console.log("create :"+ e)
                 alert(e.message)
-            })
+            }) 
+        }
+        else{
+            this.message='password not match'
+            console.log('password not match')
+        }
+        
+      },
+      addUser(uid){          
+          firebase.database().ref("Users").child(uid).set({
+              Account_No:this.formData.account_no,
+              Current_Bit:"0",
+              Email:this.formData.email,
+              Firstname:this.formData.firstname,
+              Lastname:this.formData.lastname,
+              Image:"null",
+              Password:this.formData.password,
+              Tel:this.formData.telephone,
+              Total_Bit:"0",
+              Username:this.formData.displayname
+          })
+          .then( res =>{
+            //   console.log(res)
+            this.$router.replace('/signin')
+
+
+          })
+          .catch( error => {
+              var user = firebase.auth().currentUser;
+              user.delete()
+              .then( res =>{
+
+              })
+              .catch ( err => {
+                  console.log(err)
+              })
+          })
       }
+      
   }
 }
 

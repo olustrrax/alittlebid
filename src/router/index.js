@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Main from '@/components/Main'
 import SignIn from '@/components/SignIn'
 import Register from '@/components/Register'
+import SentMail from '@/components/SentMail'
 
 Vue.use(Router)
 
@@ -19,7 +20,7 @@ let router = new Router({
     {
       path:'/register',
       name:'register',
-      component:Register
+      component:Register,
     },
     {
       path:'*',
@@ -33,6 +34,11 @@ let router = new Router({
       path:'/signin',
       name:'SignIn',
       component:SignIn
+    },
+    {
+      path:'/sentmail',
+      name:'SentMail',
+      component:SentMail
     }
   ]
 })
@@ -42,8 +48,9 @@ router.beforeEach((to, from, next) => {
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   if (requiresAuth && !currentUser) {
     next('signin')
-  } else if (!requiresAuth && currentUser) {
-    next('main')
+    
+  // } else if (!requiresAuth && currentUser) {
+  //   next('main')
   } else {
     next()
   }
