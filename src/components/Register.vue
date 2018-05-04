@@ -16,11 +16,11 @@
                 <div class="two fields">
                     <div class="field">
                         <div class="ui teal horizontal label">ชื่อจริง</div>
-                        <input type="text" v-model="formData.firstname" placeholder="นาย แดเนียล" type="text">
+                        <input type="text" v-model="formData.firstname" placeholder="นาย แดเนียล" >
                     </div>
                     <div class="field">
                         <div class="ui teal horizontal label">นามสกุล</div>
-                        <input type="text" v-model="formData.lastname" placeholder="ศรีจุลโพธิ์" type="text">
+                        <input type="text" v-model="formData.lastname" placeholder="ศรีจุลโพธิ์" >
                     </div>
                 </div>
                 <div class="field">
@@ -36,7 +36,7 @@
                 <div class="ui teal horizontal label">เบอร์โทรศัพท์</div>
                 <div class="inline fields">
                 <div class="six wide field">
-                    <input type="text" v-model="formData.telephone" placeholder="08xxxxxxxx" type="text">
+                    <input type="text" v-model="formData.telephone" placeholder="08xxxxxxxx" >
                 </div>
                 </div>
                 <div class="ui teal horizontal label" for="gender">เพศ</div>     
