@@ -9,6 +9,8 @@
             <input type="password" v-model="formData.password" class="form-control" placeholder="password">
             <br>
             <button class="btn btn-success btn-block full-width" @click="signIn">Signin</button>
+            <button class="btn btn-success btn-block full-width" @click="register">Register</button>
+
         </div>
 
     </div>
@@ -34,6 +36,9 @@
                     .catch(e=>{
                         alert(e.message)
                     })
+            },
+            register(){
+                this.$router.replace('/sentmail')
             }
         }
 }

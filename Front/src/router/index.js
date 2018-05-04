@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import Main from '@/components/Main'
 import SignIn from '@/components/SignIn'
 import Register from '@/components/Register'
+import SentMail from '@/components/SentMail'
+import Bid from '@/components/Bid'
 
 Vue.use(Router)
 
@@ -19,7 +21,7 @@ let router = new Router({
     {
       path:'/register',
       name:'register',
-      component:Register
+      component:Register,
     },
     {
       path:'*',
@@ -33,6 +35,19 @@ let router = new Router({
       path:'/signin',
       name:'SignIn',
       component:SignIn
+    },
+    {
+      path:'/sentmail',
+      name:'SentMail',
+      component:SentMail
+    },
+    {
+      path:'/bid',
+      name:'Bid',
+      component:Bid,
+      meta:{
+        requiresAuth:true
+      }
     }
   ]
 })
@@ -40,10 +55,11 @@ let router = new Router({
 router.beforeEach((to, from, next) => {
   let currentUser = firebase.auth().currentUser
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  console.log(currentUser)
   if (requiresAuth && !currentUser) {
-    next('signin')
-  } else if (!requiresAuth && currentUser) {
-    next('main')
+    next('signin')    
+  // } else if (!requiresAuth && currentUser) {
+  //   next('main')
   } else {
     next()
   }

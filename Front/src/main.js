@@ -16,13 +16,19 @@ var config = {
   storageBucket: "egco427-project.appspot.com",
   messagingSenderId: "281207958459"
 };
+
 firebase.initializeApp(config);
 window.firebase = firebase;
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  components: { App },
-  template: '<App/>'
+let app
+
+firebase.auth().onAuthStateChanged((user)=>{
+  if(!app){
+    new Vue({
+      el: '#app',
+      router,
+      components: { App },
+      template: '<App/>'
+    })
+  }
 })
