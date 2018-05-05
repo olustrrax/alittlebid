@@ -19,11 +19,9 @@ port = process.env.PORT || 8081
 
 app.use(cors())
 
-app.use(bodyParser.urlencoded({
-    extended: true
-}))
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-app.use(bodyParser.json())
 var routes = require('./api/routes/userListRoutes')
 routes(app)
 
