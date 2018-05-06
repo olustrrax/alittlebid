@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: "sentmail",
   data(){
@@ -31,84 +32,83 @@ export default {
   },
   methods:{
       startBid(){
-          console.log('click')
-        //   if(this.itemData.Start_Bid < this.formData.price)
-        //   {
-              var currentDate = new Date()
-              var day = currentDate.getDate()
-              var month = currentDate.getMonth()
-              var year = currentDate.getFullYear()
-              var time = currentDate.getTime()
-              var userId = firebase.auth().currentUser.uid
-              console.log(day+'/'+month+'/'+year+' '+time+'  '+userId)
-              firebase.database().ref('Bits').push({
+              let Bid ={
                   Bit_Amount:this.formData.price,
-                  Date:day+'/'+month+'/'+year,
                   P_ID:this.items.id,
-                  Time:time,
                   U_ID:userId
+              }
+              var userId = firebase.auth().currentUser.uid
+              axios.post('http://localhost:8081/bid',Bid)
+              .then(res=>{
+                  console.log(res.data)
               })
-              .then( res => {
-                  console.log(res)
-              })
-              .catch( err => {
+              .catch(err=>{
                   console.log(err)
               })
-        //   }
       },
       updateOldBidder(){
           var itemId = this.items.id
-          var change = parseInt(this.itemData.Current_Price)+parseInt(this.oldUser.Current_Bit)
-          firebase.database().ref('Users').child(itemData.Max_Bidder).set({
-              Bit_History:{
-                  itemId:'failed'
-              },
-              Current_Bit:change
+          var obj = {
+              id:itemId,
+              Current_Price:this.itemData[0].Current_Price,
+              Current_Bit:this.oldUser[0].Current_Bit,
+              Max_Bidder:this.itemData[0].Max_Bidder
+          }
+          axios.post('http://localhost:8081/updateoldbidder',obj)
+          .then(res=>{
+              console.log(res)
+          })
+          .catch(err=>{
+              console.log(err)
           })
       },
       updateProduct(){
-          firebase.database().ref('Products').child(this.items.type).child(this.items.id)
-          .set({
+          var obj = {
               Current_Price:this.formData.price,
-              Max_Bidder:firebase.auth().currentUser.uid
+              Max_Bidder:firebase.auth().currentUser.id
+          }
+          axios.post('http://localhost:8081/product/'+this.items.type+'/'+this.items.id,obj)
+          .then(res=>{
+              console.log(res)
+          })
+          .catch(err=>{
+              console.log(err)
           })
       },
       updateNewBidder(){
+          var itemId = this.items.id
+          var obj = {
+              id:itemId,
+              Current_Price:this.formData.price,
+              Current_Bit:this.newUser[0].Current_Bit,
+              User_ID:firebase.auth().currentUser.uid
+          }
+          axios.post('http://localhost:8081/updatenewbidder',obj)
+          .then(res=>{
+              console.log(res)
+          })
+          .catch(err=>{
+              console.log(err)
+          })
           
       }
   },
   created(){
     
       console.log(this.items.type+" "+this.items.id)
-      firebase.database().ref('Products').child(this.items.type).child(this.items.id)
-      .on("value",snapshot=>{
-          this.itemData.push(snapshot.val())
-          console.log(this.itemData)
-          console.log(this.itemData[0].Max_Bidder)
-            firebase.database().ref('Users').child(this.itemData[0].Max_Bidder)
-            .on("value",snapshot=>{
-                console.log('oldUsers')
-                this.oldUser.push(snapshot.val())
-            })
-
-      })
-
-      firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
-      .on("value",snapshot=>{
-          this.newUser.push(snapshot.val())
-
-          console.log(this.newUser)
-          console.log(this.newUser[0].Firstname)
-
-      })
+      axios.get('http://localhost:8081/user/'+firebase.auth().currentUser.uid)
+      .then(response=>{
+          this.newUser.push(response.data)
+      })  
   },
   mounted(){
-        // console.log(this.itemData)
-        // firebase.database().ref('Users').child(this.itemData.Max_Bidder)
-        // .on("value",snapshot=>{
-        //     console.log('oldUsers')
-        //     this.oldUser.push(snapshot.val())
-        // })
+        axios.get('http://localhost:8081/product/'+this.items.type+'/'+this.items.id)
+        .then(response =>{
+            response.data.forEach(element => {
+                console.log(element)
+                this.itemData.push(element)
+            });
+        })
   }
 }
 </script>

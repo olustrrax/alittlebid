@@ -17,6 +17,7 @@
 </template>
 
 <script>
+    import axios from 'axios' 
     export default {
         name: 'SignIn',
         data(){
@@ -29,16 +30,33 @@
         },
         methods:{
             signIn(){
-                firebase.auth().signInWithEmailAndPassword(this.formData.email,this.formData.password)
-                    .then(user =>{
-                        this.$router.replace('/main')
-                    })
-                    .catch(e=>{
-                        alert(e.message)
-                    })
+                let User = {
+                    Email:this.formData.email,
+                    Password:this.formData.password
+                }
+                axios.post('http://localhost:8081/signin', User) 
+                    .then((response) => { 
+                        console.log(response)
+                        if(response.data.status!='fail')
+                        {
+                            updateUserHistory()
+                        } 
+                    }) 
+                    .catch((error) => { 
+                        console.log(error) 
+                    }) 
             },
             register(){
                 this.$router.replace('/sentmail')
+            },
+            updateUserHistory(){
+                axios.post('http://localhost:8081/user/'+firebase.auth().currentUser.uid)
+                .then(res=>{
+                    this.$router.replace('/main')
+                })
+                .catch(err=>{
+                    console.log(err)
+                })
             }
         }
 }

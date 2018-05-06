@@ -25,11 +25,8 @@ app.use(bodyParser.json());
 var routes = require('./api/routes/userListRoutes')
 routes(app)
 
+var productRoutes = require('./api/routes/productListRoutes')
+productRoutes(app)
+
 app.listen(port)
 console.log('Server started on:'+port)
-
-// Test without routes
-// firebase.database().ref('Products').child('Shirt').child('-LBWPGr-R0K-kv739RF4')
-//     .on("value",snapshot=>{
-//         console.log(snapshot.val())
-//     })

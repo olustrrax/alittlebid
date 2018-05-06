@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import axios from 'axios' 
 export default {
   name: "sentmail",
   data(){
@@ -18,18 +19,20 @@ export default {
   },
   methods:{
   sentToMail(){
-            var actionCodeSettings = {
-            url: 'http://localhost:8080/#/register',
-            handleCodeInApp: true,
-            };
-            firebase.auth().sendSignInLinkToEmail(this.formData.email, actionCodeSettings)
-            .then( res =>{
-                window.localStorage.setItem('emailForSignIn', this.formData.email);
-
-            })
-            .catch(function(error) {
-                console.log(error)
-            });
+        let User={
+            Email:this.formData.email
+        }
+        axios.post('http://localhost:8081/mailverify',User)
+        .then((response)=>{
+            console.log('mail send')
+            console.log(response.data.message)
+            if(response.data.message=='success')
+            {
+                alert("Please check your Email")
+            }
+        })
+        .catch((error)=>{
+        })
       }
   }
 }
