@@ -5,7 +5,7 @@ import SignIn from '@/components/SignIn'
 import Register from '@/components/Register'
 import SentMail from '@/components/SentMail'
 import Bid from '@/components/Bid'
-
+import Product from '@/components/Product'
 Vue.use(Router)
 
 let router = new Router({
@@ -17,6 +17,11 @@ let router = new Router({
       meta:{
         requiresAuth : true
       }
+    },
+    {
+      path:'/product',
+      name:'product',
+      component:Product,
     },
     {
       path:'/register',
