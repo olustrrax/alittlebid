@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div v-for="Item in this.Product">
+        <div v-for="Item in this.Product.Pant">
         Name : {{Item.Name}}
         Bid Increse: {{Item.Bid_Increse}}
         Current Price: {{Item.Current_Price}}
@@ -27,25 +27,11 @@ import axios from 'axios'
             return {
                 imageData: [],
                 type:"",
-                Product: {
-                    Name:"",
-                    Bid_Increse:"",
-                    Current_Price:"",
-                    Date_End:"",
-                    Date_Start:"",
-                    Description:"",
-                    Image:[],
-                    Max_Bidder:"",
-                    Start_Bid:"",
-                    Time_End:"",
-                    Time_Start:"",
-                    U_ID:""
-                    
-                }
+                Product: []
             }
         },
         created: function () {
-    this.assignProduct("Pant")
+    this.assignProduct()
   },
         methods:{
            
@@ -64,13 +50,13 @@ import axios from 'axios'
             }
             
         },
-            assignProduct(type){
-                axios.get('http://localhost:8081/search/'+type)
-                .then((response) => {
-                    console.log(response.data)
-                this.Product=response.data;
-                })
-                .catch((error) => {
+            assignProduct(){
+                var ref = firebase.database().ref("Products");
+                var Pro = this.Product
+                ref.on("value",snapshot => {
+                    this.Product = snapshot.val()
+                    console.log(this.Product)
+                    console.log(this.Product.Pant)
                 })
             }
         
