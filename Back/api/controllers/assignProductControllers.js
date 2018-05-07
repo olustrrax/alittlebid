@@ -8,8 +8,8 @@ exports.assign = (req,res)=>{
 exports.allProduct = (req,res) => {
     console.log(req.params.type)
     var ref = firebase.database().ref("Products/"+req.params.type);
-    ref.on("value", function(snapshot) {
-        res.json(snapshot.val())
+    ref.once("value", function(snapshot) {
+        return res.send(snapshot.val());
      }, function (error) {
         console.log("Error: " + error.code);
      });
