@@ -1,7 +1,7 @@
 'use strict'
 module.exports = function(app){
     var userList = require('../controllers/userListControllers')
-
+    var assignList = require('../controllers/assignProductControllers')
     app.route('/register')
                 .post(userList.register)
 
@@ -20,4 +20,8 @@ module.exports = function(app){
     app.route('/user/:userId')
                 .get(userList.getUser)
                 .post(userList.updateBit)
+    app.route('/assign/:type')
+                .post(assignList.assign)
+    app.route('/search/:type')
+                .get(assignList.allProduct)
 }
