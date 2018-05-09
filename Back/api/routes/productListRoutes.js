@@ -9,6 +9,7 @@ module.exports = function(app){
     app.route('/bid')
                 .post(productList.BidItem)
 
-    app.route('/product')
-                .post(productList.getWinProduct)
+    app.route('/productstatus')
+                .post(productList.checkProductState)
+    
 }
