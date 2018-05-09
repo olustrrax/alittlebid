@@ -2,49 +2,49 @@
 var firebase = require('firebase')
 
 exports.getProductData = (req,res)=>{
-    console.log("product")
     let itemData =[]
     console.log(req.params.productType)
     console.log(req.params.productID)
-    console.log("1")
     firebase.database().ref('Products').child(req.params.productType).child(req.params.productID)
     .on("value",snapshot=>{
         itemData.push(snapshot.val())
-        console.log("2")
         res.json(itemData)   
     })
-    console.log("3")
 }
 
 exports.BidItem = (req,res)=>{
-    console.log('Bid')
+    var endDate = new Date(req.body.date_end+" "+req.body.time_end)
     var currentDate = new Date()
-    var day = currentDate.getDate()
-    var month = currentDate.getMonth()
-    var year = currentDate.getFullYear()
-    var time = currentDate.getTime()
-
-    firebase.database().ref('Bits').push({
-        Bit_Amount:req.body.Bit_Amount,
-        Date:day+'/'+month+'/'+year,
-        P_ID:req.body.P_ID,
-        Time:time,
-        U_ID:req.body.U_ID
-    })
-    .then( response => {
-        // console.log(res)
-        res.json({
-            status:'success',
+    if(req.body.price<=req.body.current_price)
+    {
+        return res.json({
+            status:'fail',
+            message:'please bit more'
+        })
+    }
+    else if(req.body.price>req.body.user.current_bit) 
+    {
+        return res.json({
+            status:'fail',
+            message:'you not have bit'
+        })
+    }
+    else if(req.body.price<=req.body.user.current_bit)
+    {
+        console.log(endDate - currentDate)
+        return res.json({
+                    status:'success',
+                    message:''
+                })
+    }
+    else
+    {
+        return res.json({
+            status:'fail',
             message:''
         })
-    })
-    .catch( err => {
-        // console.log(err)
-        res.json({
-            status:'fail',
-            message:err.message
-        })
-    })
+    }   
+    
 }
 
 exports.updateProduct=(req,res)=>{
@@ -67,34 +67,49 @@ exports.updateProduct=(req,res)=>{
           })
 }
 
-exports.getWinProduct=(req,res)=>{
-    var userID = req.body.id
+
+
+
+
+
+
+
+
+
+
+
+
+
+exports.checkProductState=(req,res)=>{
+    // console.log(req.body)
+    var endDate = new Date(req.body.Date_End+" "+req.body.Time_End)
+    // console.log("e : "+endDate)
+    // console.log(endDate.toLocaleString())
     var currentDate = new Date()
-    var day = currentDate.getDate()
-    var month = currentDate.getMonth()
-    var year = currentDate.getFullYear()
-    var time = currentDate.getTime()
-
-    var obj = []
-
-    var keys =["Pant","Shirt","Backpack","Shoes","Watch"]
-    
-    Promise.all(keys.forEach(item=>{
-        firebase.database().ref('Products/'+item)
-        .orderByChild('Max_Bidder').equalTo(userID).on("value",snapshot=>{
-            snapshot.forEach(element=>{
-                console.log(element.key)
-                obj.push(element.key)
-            })
-        
+    // console.log("c : "+currentDate )
+    // console.log(currentDate.toLocaleString())
+    if(endDate < currentDate)
+    {
+        // console.log('End')
+        res.json({
+            status:'success',
+            message:'end'
         })
-    }))
-    .then(promise=>{
-            console.log('promise end')
-            res.json(obj)
-    })
-        
-   
-    
-    
+    }
+    else if(endDate > currentDate)
+    {
+        // console.log('Yet')
+        res.json({
+            status:'success',
+            message:'Yet'
+        })
+    }
+    else{
+        // console.log('WTF's)
+        res.json({
+            status:'fail',
+            message:''
+        })
+    }
+
 }

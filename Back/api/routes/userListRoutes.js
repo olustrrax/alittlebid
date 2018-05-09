@@ -2,15 +2,6 @@
 module.exports = function(app){
     var userList = require('../controllers/userListControllers')
 
-    app.route('/register')
-                .post(userList.register)
-
-    app.route('/signin')
-                .post(userList.signIn)
-
-    app.route('/mailverify')
-                .post(userList.verify)
-
     app.route('/updateoldbidder')
                 .post(userList.updateOldBidder)
 
@@ -18,6 +9,8 @@ module.exports = function(app){
                 .post(userList.updateNewBidder)
 
     app.route('/user/:userId')
-                .get(userList.getUser)
                 .post(userList.updateBit)
+
+    app.route('/calculateBit/:total_bit/:price')
+                .get(userList.calculateBit)
 }

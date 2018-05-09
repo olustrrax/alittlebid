@@ -103,6 +103,7 @@ export default {
   created(){
     if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
     var email = window.localStorage.getItem('emailForSignIn');
+    console.log(email)
     if (!email) {
         this.$router.replace('/signin')
     }
@@ -162,7 +163,6 @@ export default {
               Username:this.formData.displayname
           })
           .then( res =>{
-            //   console.log(res)
             this.$router.replace('/signin')
 
 
@@ -182,8 +182,6 @@ export default {
   }
 }
 
-// $('.ui.radio.checkbox')
-//   .checkbox();
 </script>
 
 
