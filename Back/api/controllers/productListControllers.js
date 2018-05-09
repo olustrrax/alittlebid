@@ -1,84 +1,89 @@
 'use strict'
 var firebase = require('firebase')
 
-exports.getProductData = (req,res)=>{
-    let itemData =[]
-    console.log(req.params.productType)
-    console.log(req.params.productID)
-    firebase.database().ref('Products').child(req.params.productType).child(req.params.productID)
-    .on("value",snapshot=>{
-        itemData.push(snapshot.val())
-        res.json(itemData)   
-    })
-}
-
 exports.BidItem = (req,res)=>{
     var endDate = new Date(req.body.date_end+" "+req.body.time_end)
     var currentDate = new Date()
-    if(req.body.price<=req.body.current_price)
+    var price = parseInt(req.body.price)
+    var current_bit = parseInt(req.body.user_current_bit)
+    var current_price = parseInt(req.body.current_price)
+    if(req.body.uid==req.body.cur_uid||req.body.cur_uid==req.body.max_bidder)
     {
-        return res.json({
+        res.json({
             status:'fail',
-            message:'please bit more'
+            message:'you can`t bid this item'
         })
+        return
     }
-    else if(req.body.price>req.body.user.current_bit) 
-    {
-        return res.json({
-            status:'fail',
-            message:'you not have bit'
-        })
-    }
-    else if(req.body.price<=req.body.user.current_bit)
-    {
-        console.log(endDate - currentDate)
-        return res.json({
-                    status:'success',
+    else{
+        if(currentDate>=endDate)
+        {
+            res.json({
+                status:'fail',
+                message:'this bit is end'
+            })
+            return
+        }
+        else{
+            if(price<=current_price)
+            {
+                res.json({
+                    status:'fail',
+                    message:'please bit more'
+                })
+                return
+            }
+            else if(price>current_bit) 
+            {
+                console.log("cur_bit "+current_bit)
+                res.json({
+                    status:'fail',
+                    message:'you not have bit'
+                })
+                return
+            }
+            else if(price<=current_bit)
+            {
+                console.log(endDate - currentDate)
+                if(endDate - currentDate <= 1728000)
+                {
+                    console.log('aa')
+                    var newtime  = new Date()
+                    newtime.setTime(endDate.getTime()+(30*60*1000))
+                    console.log("new: "+newtime.toLocaleString('en-US', { 
+                        month:'numeric',day:'numeric',year:'numeric',
+                        hour: 'numeric', minute: 'numeric', second:'numeric' ,hour12: true }))
+                    res.json({
+                        status:'success',
+                        message:'add 30 minute',
+                        newEndDate:newtime.toLocaleString('en-Us',{ month:'numeric',day:'numeric',year:'numeric' }),
+                        newEndTime:newtime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second:'numeric' ,hour12: true }),
+                        currentDate:currentDate.toLocaleString(),
+                        currentTime:currentDate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second:'numeric' ,hour12: true })
+                    })
+                }
+                else{
+                    res.json({
+                            status:'success',
+                            message:'',
+                            currentDate:currentDate.toLocaleString(),
+                            currentTime:currentDate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second:'numeric' ,hour12: true })
+                    })
+                }
+                
+                return
+            }
+            else
+            {
+                res.json({
+                    status:'fail',
                     message:''
                 })
-    }
-    else
-    {
-        return res.json({
-            status:'fail',
-            message:''
-        })
-    }   
-    
+                return
+            }
+        }  
+    }  
 }
-
-exports.updateProduct=(req,res)=>{
-    firebase.database().ref('Products').child(req.params.productType).child(req.params.productID)
-          .update({
-              Current_Price:req.body.Current_Price,
-              Max_Bidder:req.body.Max_Bidder
-          })
-          .then(product=>{
-            res.json({
-                status:'success',
-                message:''
-            })
-          })
-          .catch(err=>{
-              res.json({
-                  status:'fail',
-                  message:err.message
-              })
-          })
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 exports.checkProductState=(req,res)=>{
     // console.log(req.body)

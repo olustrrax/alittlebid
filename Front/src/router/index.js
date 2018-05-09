@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Main from '@/components/Main'
 import SignIn from '@/components/SignIn'
 import Register from '@/components/Register'
-import SentMail from '@/components/SentMail'
 import Bid from '@/components/Bid'
 import Product from '@/components/Product'
 import List from '@/components/ProductList'
@@ -46,11 +45,6 @@ let router = new Router({
       path:'/signin',
       name:'SignIn',
       component:SignIn
-    },
-    {
-      path:'/sentmail',
-      name:'SentMail',
-      component:SentMail
     },
     {
       path:'/bid',

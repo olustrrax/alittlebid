@@ -36,70 +36,118 @@ export default {
                 price:this.formData.price,
                 current_price:this.itemData[0].Current_Price,
                 user_current_bit:this.newUser[0].Current_Bit,
-                end_date:this.itemData[0].End_Date,
-                end_time:this.itemData[0].End_Time
+                date_end:this.itemData[0].Date_End,
+                time_end:this.itemData[0].Time_End,
+                uid:this.itemData[0].U_ID,
+                max_bidder:this.itemData[0].Max_Bidder,
+                cur_uid:firebase.auth().currentUser.uid
             }
             var userId = firebase.auth().currentUser.uid
-            
             axios.post('http://localhost:8081/bid',Bid)
             .then(res=>{
-                    // firebase.database().ref('Bits').push({
-                    // Bit_Amount:req.body.Bit_Amount,
-                    // Date:day+'/'+month+'/'+year,
-                    // P_ID:req.body.P_ID,
-                    // Time:time,
-                    // U_ID:req.body.U_ID
-                // })
+                console.log('Bit return : '+ res.data.message)
+                if(res.data.status=='success')
+                {
+                    if(res.data.message=='add 30 minute')
+                    {
+                        firebase.database().ref('Products').child(this.items.type).child(this.items.id)
+                        .update({
+                            Date_End:res.data.newEndDate,
+                            Time_End:res.data.newEndTime
+                        })
+                    }
+                
+                    firebase.database().ref('Bits').push({
+                        Bit_Amount:this.formData.price,
+                        Date:res.data.currentDate,
+                        P_ID:this.items.id,
+                        Time:res.data.currentTime,
+                        U_ID:firebase.auth().currentUser.uid
+                    })
+                    .then(bithist=>{
+                        this.updateOldBidder(bithist.key)
+                    })
+                    .catch(biterr=>{
+                        return
+                    })
+                }
             })
             .catch(err=>{
                 console.log(err)
+                return
             })
       },
-      updateOldBidder(){
-          var itemId = this.items.id
-          var obj = {
-              id:itemId,
-              Current_Price:this.itemData[0].Current_Price,
-              Current_Bit:this.oldUser[0].Current_Bit,
-              Max_Bidder:this.itemData[0].Max_Bidder
-          }
-          axios.post('http://localhost:8081/updateoldbidder',obj)
-          .then(res=>{
-              console.log(res)
-          })
-          .catch(err=>{
-              console.log(err)
-          })
-      },
-      updateProduct(){
-          var obj = {
-              Current_Price:this.formData.price,
-              Max_Bidder:firebase.auth().currentUser.id
-          }
-          axios.post('http://localhost:8081/product/'+this.items.type+'/'+this.items.id,obj)
-          .then(res=>{
-              console.log(res)
-          })
-          .catch(err=>{
-              console.log(err)
-          })
+      updateOldBidder(key){
+        axios.get('http://localhost:8081/change/'+this.oldUser[0].Current_Bit+'/'+this.itemData[0].Current_Price)
+        .then(res=>{
+            firebase.database().ref('Users').child(this.itemData[0].Max_Bidder).update({
+                Current_Bit:res.data.message
+            })
+            .then( user =>{
+                firebase.database().ref('Users').child(this.itemData[0].Max_Bidder).child('Bit_History')
+                .child(this.items.id).set({
+                    status:'failed'
+                })
+                .then(stat=>{
+                    console.log('updateOld end')
+                    this.updateNewBidder()
+                })
+                .catch(err=>{
+                    firebase.database().ref('Bits').child(key).remove()
+                    .then(res=>{
+                        return
+                    })
+                    
+                })
+            })
+            .catch( usererr=>{
+                return
+            })
+        })
+          
+
       },
       updateNewBidder(){
-          var itemId = this.items.id
-          var obj = {
-              id:itemId,
-              Current_Price:this.formData.price,
-              Current_Bit:this.newUser[0].Current_Bit,
-              User_ID:firebase.auth().currentUser.uid
-          }
-          axios.post('http://localhost:8081/updatenewbidder',obj)
+          axios.get('http://localhost:8081/calculateBit/'+this.newUser[0].Current_Bit+'/'+this.formData.price)
           .then(res=>{
-              console.log(res)
+              console.log('calbit :'+res.data.status)
+              if(res.data.status=='success')
+              {
+                firebase.database().ref('Users').child(firebase.auth().currentUser.uid).update({
+                        Current_Bit:res.data.message
+                })
+                .then(user=>{
+                        firebase.database().ref('Users').child(firebase.auth().currentUser.uid).child('Bit_History')
+                        .child(this.items.id).set({
+                            status:this.formData.price
+                        })
+                        .then(bitRes=>{
+                            console.log('updateNew end')
+                            this.updateProduct()
+                        })
+                        .catch(biterr=>{
+                            return
+                        })
+                })
+                .catch(err=>{
+                    
+                })
+              }
+          })  
+      },
+      updateProduct(){
+          console.log(this.items.type+" "+this.items.id)
+          firebase.database().ref('Products').child(this.items.type).child(this.items.id)
+          .update({
+                Current_Price:this.formData.price,
+                Max_Bidder:firebase.auth().currentUser.uid
+          })
+          .then(product=>{
+              console.log("pro ")
           })
           .catch(err=>{
               console.log(err)
           })
-          
       }
   },
   created(){

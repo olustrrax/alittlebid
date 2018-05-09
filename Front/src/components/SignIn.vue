@@ -42,7 +42,7 @@
                     })
             },
             register(){
-                this.$router.replace('/sentmail')
+                this.$router.replace('/register')
             },
             getUserData(){
                 firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
