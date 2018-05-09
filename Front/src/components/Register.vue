@@ -101,33 +101,7 @@ export default {
       }
   },
   created(){
-    if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
-    var email = window.localStorage.getItem('emailForSignIn');
-    if (!email) {
-        this.$router.replace('/signin')
-    }
-    firebase.auth().signInWithEmailLink(email, window.location.href)
-      .then(function(result) {
-        window.localStorage.removeItem('emailForSignIn');
-        var user = firebase.auth().currentUser
-        user.delete()
-              .then( res =>{
-
-              })
-              .catch ( err => {
-                  console.log(err)
-              })
-
-      })
-      .catch(function(error) {
-        console.log('auth with mail linke '+error)
-      });
-    }
-    else{                    
-        this.$router.replace('/signin')
-
-    }
-
+  
   },
   methods:{
       signUp(){
@@ -162,7 +136,6 @@ export default {
               Username:this.formData.displayname
           })
           .then( res =>{
-            //   console.log(res)
             this.$router.replace('/signin')
 
 
@@ -182,8 +155,6 @@ export default {
   }
 }
 
-// $('.ui.radio.checkbox')
-//   .checkbox();
 </script>
 
 

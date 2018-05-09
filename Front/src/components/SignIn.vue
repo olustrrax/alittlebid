@@ -25,37 +25,87 @@
                 formData: {
                     email: '',
                     password: ''
-                }
+                },
+                userData:[],
+                winProduct:[],
             }
         },
         methods:{
             signIn(){
-                let User = {
-                    Email:this.formData.email,
-                    Password:this.formData.password
-                }
-                axios.post('http://localhost:8081/signin', User) 
-                    .then((response) => { 
-                        console.log(response)
-                        if(response.data.status!='fail')
-                        {
-                            updateUserHistory()
-                        } 
-                    }) 
-                    .catch((error) => { 
-                        console.log(error) 
-                    }) 
+                firebase.auth().signInWithEmailAndPassword(this.formData.email,this.formData.password)
+                    .then(user =>{
+                        this.getUserData()
+                        this.$router.replace('/main')
+                    })
+                    .catch(e=>{
+                        alert("SignIn "+e)
+                    })
             },
             register(){
                 this.$router.replace('/sentmail')
             },
-            updateUserHistory(){
-                axios.post('http://localhost:8081/user/'+firebase.auth().currentUser.uid)
-                .then(res=>{
-                    this.$router.replace('/main')
+            getUserData(){
+                firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
+                .once("value",snapshot=>{
+                    this.userData=[]
+                    this.userData.push(snapshot.val())
+                    console.log(this.userData)
+                    this.getWinProduct()
                 })
-                .catch(err=>{
-                    console.log(err)
+                .catch(e=>{
+                    console.log(e)
+                })
+            },
+            getWinProduct(){
+                var keys =["Pant","Shirt","Backpack","Shoes","Watch"]
+                keys.forEach(item => {
+                    firebase.database().ref('Products/'+item).orderByChild('Max_Bidder').equalTo(firebase.auth().currentUser.uid)
+                        .once("value",snapshot=>{
+                            this.winProduct=[]
+                            snapshot.forEach(element => {
+                                console.log(element.key)
+                                this.getProductData(item,element.key)
+                            })
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                })
+                
+            },
+            updateHistory(pid){
+                var total
+                firebase.database().ref('Users').child(firebase.auth().currentUser.uid).child('Bit_History')
+                .child(pid).once("value",snapshot=>{
+                    console.log(snapshot.val().status)
+                    axios.get('http://localhost:8081/calculateBit/'+this.userData[0].Total_Bit+'/'+snapshot.val().status)
+                    .then(res=>{
+                        total=res.data.message
+
+                        firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
+                        .update({
+                            Total_Bit:total
+                        })
+                        .then(user => {
+                            firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
+                            .child('Bit_History').child(pid).update({
+                                status:'completed'
+                            })
+                        })
+                    })
+                })  
+            },
+            getProductData(type,key){
+                // console.log('getproductData')
+                firebase.database().ref('Products').child(type).child(key)
+                .once("value",snapshot=>{
+                    axios.post('http://localhost:8081/productstatus',snapshot.val())
+                    .then(res=>{
+                        if(res.data.message=='end')
+                        {
+                            this.updateHistory(key)
+                        }
+                    })
                 })
             }
         }
