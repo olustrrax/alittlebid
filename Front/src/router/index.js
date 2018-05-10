@@ -7,6 +7,9 @@ import Register from '@/components/Register'
 import Bid from '@/components/Bid'
 import Product from '@/components/Product'
 import List from '@/components/ProductList'
+import EditUser from '@/components/EditUser'
+import Refill from '@/components/Refill'
+
 Vue.use(Router)
 
 let router = new Router({
@@ -15,9 +18,6 @@ let router = new Router({
       path: '/main',
       name: 'main',
       component: Main,
-      meta:{
-        requiresAuth : true
-      }
     },
     {
       path:'/product',
@@ -54,6 +54,22 @@ let router = new Router({
       meta:{
         requiresAuth:true
       }
+    },
+    {
+      path:'/edituser',
+      name:'EditUser',
+      component:EditUser,
+      meta:{
+        requiresAuth:true
+      }
+    },
+    {
+      path:'/refill',
+      name:'Refill',
+      component:Refill,
+      meta:{
+        requiresAuth:true
+      }
     }
   ]
 })
@@ -64,8 +80,8 @@ router.beforeEach((to, from, next) => {
   // console.log(currentUser.uid)
   if (requiresAuth && !currentUser) {
     next('signin')    
-  } else if (!requiresAuth && currentUser) {
-    next('main')
+  // } else if (!requiresAuth && currentUser) {
+  //   next('main')
   } else {
     next()
   }

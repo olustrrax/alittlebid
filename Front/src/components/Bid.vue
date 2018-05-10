@@ -45,36 +45,46 @@ export default {
             var userId = firebase.auth().currentUser.uid
             axios.post('http://localhost:8081/bid',Bid)
             .then(res=>{
-                console.log('Bit return : '+ res.data.message)
-                if(res.data.status=='success')
-                {
-                    if(res.data.message=='add 30 minute')
+                new Promise((resolve,reject)=>{
+                    console.log('Bit return : '+ res.data.message)
+                    if(res.data.status=='success')
                     {
-                        firebase.database().ref('Products').child(this.items.type).child(this.items.id)
-                        .update({
-                            Date_End:res.data.newEndDate,
-                            Time_End:res.data.newEndTime
+                        if(res.data.message=='add 30 minute')
+                        {
+                            firebase.database().ref('Products').child(this.items.type).child(this.items.id)
+                            .update({
+                                Date_End:res.data.newEndDate,
+                                Time_End:res.data.newEndTime
+                            })
+                        }
+                    
+                        firebase.database().ref('Bits').push({
+                            Bit_Amount:this.formData.price,
+                            Date:res.data.currentDate,
+                            P_ID:this.items.id,
+                            Time:res.data.currentTime,
+                            U_ID:firebase.auth().currentUser.uid
+                        })
+                        .then(bithist=>{
+                            this.updateOldBidder(bithist.key)
+                        })
+                        .catch(biterr=>{
+                            reject()
                         })
                     }
+                })
+                .then(promise=>{
+                    console.log('Bid success')
+                })
+                .catch(promise=>{
+                    console.log('Bid failed')
+                    this.reverse()
+                })
                 
-                    firebase.database().ref('Bits').push({
-                        Bit_Amount:this.formData.price,
-                        Date:res.data.currentDate,
-                        P_ID:this.items.id,
-                        Time:res.data.currentTime,
-                        U_ID:firebase.auth().currentUser.uid
-                    })
-                    .then(bithist=>{
-                        this.updateOldBidder(bithist.key)
-                    })
-                    .catch(biterr=>{
-                        return
-                    })
-                }
             })
             .catch(err=>{
                 console.log(err)
-                return
+                
             })
       },
       updateOldBidder(key){
@@ -93,15 +103,11 @@ export default {
                     this.updateNewBidder()
                 })
                 .catch(err=>{
-                    firebase.database().ref('Bits').child(key).remove()
-                    .then(res=>{
-                        return
-                    })
-                    
+                    reject()
                 })
             })
             .catch( usererr=>{
-                return
+                reject()
             })
         })
           
@@ -126,11 +132,11 @@ export default {
                             this.updateProduct()
                         })
                         .catch(biterr=>{
-                            return
+                            reject()
                         })
                 })
                 .catch(err=>{
-                    
+                    reject()
                 })
               }
           })  
@@ -147,7 +153,46 @@ export default {
           })
           .catch(err=>{
               console.log(err)
+              reject()
           })
+      },
+      reverse(){
+          console.log('reverse')
+          new Promise ((resolve,reject)=>{
+              firebase.database().ref('Users').child(firebase.auth().currentUser.uid).set(this.newUser[0])
+              .then(res=>{
+                  console.log('revese new user successed')
+              })
+              .catch(err=>{
+                  console.log('revese fail at new user')
+                  reject()
+              })
+
+              firebase.database().ref('Users').child(this.itemData[0].Max_Bidder).set(this.oldUser[0])
+              .then(res=>{
+                  console.log('revese old user successed')
+              })
+              .catch(err=>{
+                  console.log('reverse fail at old user')
+                  reject()
+              })
+
+              firebase.database().ref('Products').child(this.items.type).child(this.items.id).set(this.itemData[0])
+              .then(res=>{
+                  console.log('revese product successed')
+              })
+              .catch(err=>{
+                  console.log('reverse fail at product')
+                  reject()
+              })
+          })
+          .then(promise=>{
+              console.log('reverse success')
+          })
+          .catch(promise=>{
+              console.log('reverse failed')
+          })
+
       }
   },
   created(){

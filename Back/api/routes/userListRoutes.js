@@ -7,4 +7,7 @@ module.exports = function(app){
 
     app.route('/change/:current_bit/:price')
                 .get(userList.changeBit)
+
+    app.route('/refill/:current_bit/:total_bit/:refill_bit')
+                .get(userList.refill)
 }

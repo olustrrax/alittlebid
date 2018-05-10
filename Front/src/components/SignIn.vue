@@ -28,6 +28,7 @@
                 },
                 userData:[],
                 winProduct:[],
+                productData:[],
             }
         },
         methods:{
@@ -81,22 +82,39 @@
                     axios.get('http://localhost:8081/calculateBit/'+this.userData[0].Total_Bit+'/'+snapshot.val().status)
                     .then(res=>{
                         total=res.data.message
-
-                        firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
-                        .update({
-                            Total_Bit:total
-                        })
-                        .then(user => {
+                        new Promise((resolve,reject)=>{
                             firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
-                            .child('Bit_History').child(pid).update({
-                                status:'completed'
+                            .update({
+                                Total_Bit:total
                             })
+                            .then(user => {
+                                firebase.database().ref('Users').child(firebase.auth().currentUser.uid)
+                                .child('Bit_History').child(pid).update({
+                                    status:'completed'
+                                })
+                                .then(up=>{
+                                    resolve()
+                                })
+                                .catch(errup=>{
+                                    reject()
+                                })
+                                
+                            })
+                            .catch(err=>{
+                                reject()
+                            })
+                        })
+                        .then(resolve=>{
+                            console.log('complete')
+                        })
+                        .catch(reject=>{
+                            console.log('reject')
+                            this.reverse()
                         })
                     })
                 })  
             },
             getProductData(type,key){
-                // console.log('getproductData')
                 firebase.database().ref('Products').child(type).child(key)
                 .once("value",snapshot=>{
                     axios.post('http://localhost:8081/productstatus',snapshot.val())
@@ -106,6 +124,15 @@
                             this.updateHistory(key)
                         }
                     })
+                })
+            },
+            reverse(){
+                firebase.database().ref('Users').child(firebase.auth().currentUser.uid).set(this.userData[0])
+                .then(res=>{
+                    console.log('resever')
+                })
+                .catch(err=>{
+                    console.log('error reverse')
                 })
             }
         }

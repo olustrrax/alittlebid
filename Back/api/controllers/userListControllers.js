@@ -31,5 +31,22 @@ exports.changeBit=(req,res)=>{
             message:err
         })
     }
+}
 
+exports.refill=(req,res)=>{
+    try{
+        var current_bit = parseInt(req.params.current_bit)+parseInt(req.params.refill)
+        var total_bit   = parseInt(req.params.total_bit)+parseInt(req.params.refill)
+        res.json({
+            status:'success',
+            current_bit:current_bit,
+            total_bit:total_bit
+        })
+    }
+    catch(err){
+        res.json({
+            status:'fail',
+            message:err
+        })
+    }
 }
