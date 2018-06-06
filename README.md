@@ -12,3 +12,13 @@ password: 111111
 
 username: 2@2.com
 password: 111111  
+
+## Preparing
+- node js (webpack-cli, vue-cli)
+- firebase
+
+```
+npm run dev
+
+```
+

@@ -1,7 +1,6 @@
 'use strict'
 var firebase = require('firebase')
 
-
 exports.calculateBit=(req,res)=>{
     try{
         var total = parseInt(req.params.total_bit)-parseInt(req.params.price)
